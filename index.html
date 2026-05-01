@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>💖 Abo LOLO x Om LOLO - Secret Love Game 💖</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Cairo',sans-serif;
+  background:#000;
+  overflow:hidden;
+  color:white;
+}
+
+.hidden{display:none;}
+
+#lockScreen{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(135deg,#ff2e63,#ffb6c1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:9999;
+  text-align:center;
+  padding:20px;
+}
+
+#lockScreen input{
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  margin-top:10px;
+  text-align:center;
+  font-size:16px;
+}
+
+#lockScreen button{
+  margin-top:10px;
+  padding:10px 20px;
+  border:none;
+  border-radius:20px;
+  background:#000;
+  color:white;
+  cursor:pointer;
+}
+
+.story{
+  width:100vw;
+  height:100vh;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+.bg{
+  position:absolute;
+  inset:0;
+  transition:0.5s;
+}
+
+.content{
+  position:relative;
+  z-index:2;
+  max-width:520px;
+  padding:20px;
+}
+
+.title{
+  font-family:'Great Vibes',cursive;
+  font-size:42px;
+}
+
+.text{
+  font-size:18px;
+  line-height:2;
+  background:rgba(0,0,0,0.35);
+  padding:18px;
+  border-radius:20px;
+}
+
+.bar{
+  position:absolute;
+  top:10px;
+  left:10px;
+  right:10px;
+  height:4px;
+  background:rgba(255,255,255,0.3);
+  border-radius:10px;
+}
+
+.bar-inner{
+  height:100%;
+  width:0%;
+  background:white;
+}
+
+.left,.right{
+  position:absolute;
+  top:0;
+  width:50%;
+  height:100%;
+  z-index:3;
+}
+.left{left:0;}
+.right{right:0;}
+
+.heart{
+  position:fixed;
+  bottom:-10px;
+  animation:floatUp 6s linear infinite;
+}
+
+@keyframes floatUp{
+  0%{transform:translateY(0);opacity:1;}
+  100%{transform:translateY(-110vh);opacity:0;}
+}
+
+#gameArea{
+  position:fixed;
+  inset:0;
+  z-index:50;
+}
+
+.fallingHeart{
+  position:absolute;
+  font-size:26px;
+  animation:fall linear forwards;
+  cursor:pointer;
+}
+
+@keyframes fall{
+  0%{transform:translateY(-50px);opacity:1;}
+  100%{transform:translateY(110vh);opacity:0;}
+}
+
+#scoreBoard{
+  position:fixed;
+  top:10px;
+  right:10px;
+  background:rgba(0,0,0,0.6);
+  padding:10px;
+  border-radius:10px;
+  z-index:100;
+}
+
+.cat{
+  position:fixed;
+  bottom:10px;
+  left:10px;
+  width:70px;
+  cursor:pointer;
+  z-index:60;
+}
+
+.levelPop{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.85);
+  padding:20px;
+  border-radius:15px;
+  z-index:9999;
+  font-size:18px;
+  text-align:center;
+}
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <h2>🔐 Secret Love Story</h2>
+  <p>دخل الكود ❤️</p>
+  <input type="password" id="pass">
+  <button onclick="checkPass()">دخول</button>
+</div>
+
+<div id="scoreBoard" class="hidden">❤️ Score: <span id="score">0</span></div>
+<div id="gameArea"></div>
+
+<img class="cat hidden" src="https://media.tenor.com/2roX3uxz_68AAAAC/panda-dance.gif" onclick="catMsg()">
+
+<div class="story hidden">
+
+<div class="bg" id="bg"></div>
+
+<div class="bar"><div class="bar-inner" id="bar"></div></div>
+
+<div class="left" onclick="event.stopPropagation();prev()"></div>
+<div class="right" onclick="event.stopPropagation();next()"></div>
+
+<div class="content">
+  <div class="title" id="title"></div>
+  <div class="text" id="text"></div>
+</div>
+
+</div>
+
+<script>
+function checkPass(){
+  if(document.getElementById("pass").value=="lolo123"){
+    document.getElementById("lockScreen").style.display="none";
+    startApp();
+  } else alert("❌ خطأ");
+}
+
+const stories=[
+{title:"البداية 💫",text:"بدأ كلشي بنظرة ❤️",color:"#ff2e63"},
+{title:"الحب 💖",text:"نتي روحي ❤️",color:"#ff4d6d"},
+{title:"العشق 💍",text:"ما بقيتيش مجرد إحساس بل حياتي كاملة ❤️",color:"#ff006e"},
+{title:"القدر 💞",text:"هاد الحب مكتوب وما فيهش نهاية ❤️",color:"#c9184a"}
+];
+
+let i=0;
+let score=0;
+let level=0;
+
+function render(){
+  document.getElementById("title").innerText=stories[i].title;
+  document.getElementById("text").innerText=stories[i].text;
+  document.getElementById("bg").style.background=stories[i].color;
+  document.getElementById("bar").style.width=((i+1)/stories.length*100)+"%";
+}
+
+function next(){if(i<stories.length-1){i++;render();}}
+function prev(){if(i>0){i--;render();}}
+
+function showLevelPop(msg){
+  const d=document.createElement("div");
+  d.className="levelPop";
+  d.innerText=msg;
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(),2000);
+}
+
+function checkLevel(){
+  if(level<stories.length-1 && score>=(level+1)*5){
+    level++;
+    i=level;
+    render();
+    showLevelPop("💖 Level Up! الحب كيكبر أكثر");
+  }
+}
+
+function spawnHeart(){
+  const h=document.createElement("div");
+  h.className="fallingHeart";
+  h.innerHTML="❤️";
+  h.style.left=Math.random()*100+"vw";
+  h.style.animationDuration=(3+Math.random()*3)+"s";
+
+  h.onclick=()=>{
+    score++;
+    document.getElementById("score").innerText=score;
+    h.remove();
+    checkLevel();
+  };
+
+  document.getElementById("gameArea").appendChild(h);
+  setTimeout(()=>h.remove(),6000);
+}
+
+function startGame(){
+  setInterval(spawnHeart,400);
+}
+
+function startApp(){
+  document.querySelector(".story").classList.remove("hidden");
+  document.querySelector(".cat").classList.remove("hidden");
+  document.getElementById("scoreBoard").classList.remove("hidden");
+
+  render();
+  startGame();
+}
+
+function catMsg(){
+  alert("🐼 كنحبك بزاف ❤️");
+}
+</script>
+
+</body>
+</html>
